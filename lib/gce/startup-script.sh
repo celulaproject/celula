@@ -25,14 +25,14 @@ disable_services() {
   # sudo systemctl --no-reload disable google-ip-forwarding-daemon.service
 }
 
-allowed_ports() {
-  iptables -A INPUT -p tcp -m tcp -m multiport ! --dports 443,3141 -j DROP
+execute_install_script() {
+  wget -qO - _SCRIPT_URL_ | bash
 }
 
 main() {
   dissalow_login
   disable_services
-  allowed_ports
+  execute_install_script
 }
 
 main

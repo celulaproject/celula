@@ -9,6 +9,7 @@
   "author": "Jaime Echegaray Zipper",
   "license": "ISC",
   "dependencies": {
-    "google-cloud": "^0.47.0"
+    "google-cloud": "^0.47.0",
+    "valid-url": "^1.0.9"
   }
 }
