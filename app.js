@@ -3,6 +3,7 @@
 const signatures = require('sodium-signatures')
 const identity = require('./lib/identity')
 const replicate = require('./lib/gce/index')
+const getClaims = require('./lib/getClaims')
 
 const Koa = require('koa')
 const _ = require('koa-route')
@@ -20,9 +21,20 @@ const celula = {
       generation: keys.generation
     }
   },
-  getClaims: (ctx) => {
-    // get a full list of saved claims
-    ctx.body = 'ok'
+  getClaims: (ctx, uuid) => {
+    return getClaims(uuid)
+    .then((value) => {
+      ctx.body = value
+    })
+    .catch((err) => {
+      if (err && err.notFound) {
+        return ctx.throw(404)
+      }
+      if (err && err.statusCode) {
+        return ctx.throw(err.statusCode, err.message)
+      }
+      return ctx.throw(500, err)
+    })
   },
   sign: (ctx) => {
     let signature = signatures.sign(Buffer.from(JSON.stringify(ctx.request.body)), keys.secretKey)
