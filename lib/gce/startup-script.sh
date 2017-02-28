@@ -25,14 +25,42 @@ disable_services() {
   # sudo systemctl --no-reload disable google-ip-forwarding-daemon.service
 }
 
-execute_install_script() {
-  wget -qO - _SCRIPT_URL_ | bash
+install_celula() {
+  #set locale as en_US.UTF-8
+  export LC_ALL="en_US.UTF-8"
+  locale-gen
+  #update
+  apt-get update && sudo apt-get upgrade -y
+  apt-get install build-essential -y
+  #git
+  apt-get install git -y
+  #node 7x
+  curl -sL https://deb.nodesource.com/setup_7.x | bash -
+  apt-get install nodejs -y
+  #allow node use port 80/443
+  setcap cap_net_bind_service=+ep /usr/bin/nodejs
+  # create user
+  useradd -s /bin/bash -m -d /home/celula celula
+  cd /home/celula
+  git clone https://jaime-ez@bitbucket.org/jaime-ez/celula.git
+  cd celula && npm install
+  env PATH=$PATH:/usr/bin /home/celula/celula/node_modules/pm2/bin/pm2 startup systemd -u celula --hp /home/celula
+  su - celula -c "cd celula && npm start"
+}
+
+install_script() {
+  useradd -s /bin/bash -m -d /home/scriptUser scriptUser
+  git clone _REPO_URL_ /home/scriptUser/repo
+  cd /home/scriptUser/repo && npm install
+  su - scriptUser -c "cd repo && npm start"
 }
 
 main() {
   dissalow_login
   disable_services
-  execute_install_script
+  install_celula
+  #_install_script_
+  echo "Awesome script, great job!"
 }
 
 main
