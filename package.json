@@ -17,6 +17,7 @@
     "level": "^1.6.0",
     "pm2": "^2.4.1",
     "selfsigned": "^1.8.0",
+    "sodium-signatures": "^2.0.0",
     "superagent": "^3.5.0",
     "through2": "^2.0.3",
     "uuid": "^3.0.1",
