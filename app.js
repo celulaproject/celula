@@ -5,6 +5,8 @@ const identity = require('./lib/identity')
 const replicate = require('./lib/gce/index')
 const getClaims = require('./lib/getClaims')
 
+const https = require('https')
+const selfsigned = require('selfsigned')
 const Koa = require('koa')
 const _ = require('koa-route')
 const bodyParser = require('koa-bodyparser')
@@ -65,8 +67,13 @@ app.use(_.post('/replicate', celula.replicate))
 identity(generation)
 .then((value) => {
   keys = value
-  app.listen(3141)
-  console.log('listening on port 3141')
+  // create ssl certs and server
+  let pems = selfsigned.generate([{ name: 'commonName', value: 'celula' }], { days: 10000 })
+  https.createServer({
+    key: pems.private,
+    cert: pems.cert
+  }, app.callback()).listen(3141)
+  console.log('listening over https on port 3141')
 })
 .catch((err) => {
   console.error('identityError:', err)
