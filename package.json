@@ -4,7 +4,8 @@
   "description": "Make computers behave like cells",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 ~/node_modules/pm2/bin/pm2 start app.js"
   },
   "author": "Jaime Echegaray Zipper",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "koa-bodyparser": "^4.0.0",
     "koa-route": "^3.2.0",
     "level": "^1.6.0",
+    "pm2": "^2.4.1",
     "selfsigned": "^1.8.0",
     "superagent": "^3.5.0",
     "through2": "^2.0.3",
