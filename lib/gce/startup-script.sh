@@ -41,18 +41,19 @@ install_celula() {
   setcap cap_net_bind_service=+ep /usr/bin/nodejs
   # create user
   useradd -s /bin/bash -m -d /home/celula celula
-  cd /home/celula
-  git clone https://jaime-ez@bitbucket.org/jaime-ez/celula.git
-  cd celula && npm install
+  su - celula -c 'chmod -R 700 /home/celula'
+  su - celula -c 'git clone https://jaime-ez@bitbucket.org/jaime-ez/celula.git'
+  su - celula -c 'cd celula  && npm install'
   env PATH=$PATH:/usr/bin /home/celula/celula/node_modules/pm2/bin/pm2 startup systemd -u celula --hp /home/celula
-  su - celula -c "cd celula && npm start"
+  su - celula -c 'cd celula && npm start'
 }
 
 install_script() {
   useradd -s /bin/bash -m -d /home/scriptUser scriptUser
-  git clone _REPO_URL_ /home/scriptUser/repo
-  cd /home/scriptUser/repo && npm install
-  su - scriptUser -c "cd repo && npm start"
+  su - scriptUser -c 'chmod -R 700 /home/scriptUser'
+  su - scriptUser -c 'git clone _REPO_URL_ ~/repo'
+  su - scriptUser -c 'cd ~/repo && npm install'
+  su - scriptUser -c 'cd repo && npm start'
 }
 
 main() {
