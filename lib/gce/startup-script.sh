@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-dissalow_login() {
+disallow_login() {
   sed -ie 's/bin\/bash/usr\/sbin\/nologin/g' /etc/passwd
 }
 
@@ -59,7 +59,7 @@ install_script() {
 }
 
 main() {
-  dissalow_login
+  disallow_login
   disable_services
   install_celula
   #_install_script_
