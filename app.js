@@ -13,7 +13,7 @@ const bodyParser = require('koa-bodyparser')
 const app = new Koa()
 app.use(bodyParser())
 
-const generation = process.argv[2]
+const generation = process.env.CELULA_GEN ? process.env.CELULA_GEN : 'gen:0'
 let keys = null
 
 const celula = {

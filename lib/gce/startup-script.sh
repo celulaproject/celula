@@ -45,6 +45,8 @@ install_celula() {
   su - celula -c 'git clone https://jaime-ez@bitbucket.org/jaime-ez/celula.git'
   su - celula -c 'cd celula  && npm install'
   env PATH=$PATH:/usr/bin /home/celula/celula/node_modules/pm2/bin/pm2 startup systemd -u celula --hp /home/celula
+  su - celula -c 'echo "export CELULA_GEN=_CELULA_NEXT_GENERATION_" >> .profile'
+  su - celula -c 'source .profile'
   su - celula -c 'cd celula && npm start'
 }
 
