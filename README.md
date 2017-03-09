@@ -1,6 +1,6 @@
 # Celula  
 
-Celula is an approach to solve the problem of knowing with absolute certainty the actual code running in a server: remote software attestation. Celula extracts analogies from the biology sphere into computer programs and networks in order to propose a software based solution for this problem.
+Celula is an approach to solve the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation. Celula extracts analogies from the biology sphere into computer programs and networks in order to propose a software based solution for this problem.
 
 The scope of Celula is very limited and subject to thorough review by hardware, software and systems experts. My intention is to start a discussion based on the prototype built for this purpose that will hopefully contribute to a wider solution to this problem.  
 
@@ -61,13 +61,26 @@ This prototype includes the core implementation that exposes a server that handl
 - generation N (gen:N, N > 0): the nth descendant of a gen:0 instance.  
 - claim: a statement cryptographically signed by the gen:N (N >=0) instance that states the creation of gen:(N+1) instance and some if its properties.  
 - replication: the act of requesting a Celula instane to clone itself on a third party instance and optionally deploy a third party NodeJS module.  
+- source instance: the Celula instance that receives a replication request.  
+- destination instance: the Celula instance that is created after a replication request.  
+
+### Basic principle  
+
+Each Celula instance is characterized by its key pair that define its identity. The key pair is generated using the NodeJS port of libsodium.  
+
+When a new Celula instance is launched, it generates a key pair whose public key is exposed through the API in order to reveal its identity. When a third party makes a request to replicate, the Celula instance will query the GCE API in order to launch a new VM with an encrypted disk and running the Celula startup script. After the script is executed successfully, the source instance will query the destination instance until it's identity is available and then sign a claim stating it created such destination instance.  
+
+From that moment on, any interested party can verify the claim made by the source instance and have proof of the state of the destination instance.  
+
+Generation zero instances act as the root of a chain of trust since there is no way to ascertain that the launcher of the first Celula instance didn't access the key pair in order to forge false generation claims.
 
 ### Limitations  
 
-- The prototype is implemented to work on Google Compute Engine but it can work on any IaaS that satisfies the before mentioned conditions.  
+- The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
 - Only NodeJS modules are supported for replication.  
 - The startup-script to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
+- The format of claims and the associated logic of storing and making them available must be reviewed. Maybe a DNS like system for matching public keys to an IP is also required.  
 
 ## Setup  
 
@@ -76,6 +89,94 @@ In order to launch a generation zero instance:
 - cd celula && npm install
 - npm start  
 
-If you wish to provide a certain degree of trust in your generation zero instance use zeit command line tool to freely create a server that will expose its contents.  
+If you wish to provide a certain degree of trust in your generation zero instance use zeit command line tool to freely create a server that will expose its contents and to which you will not have ssh access.  
 
 ## Celula API  
+
+The Celula API is available under https at the 3141 port on every instance running Celula.  
+
+### `GET` /id
+Returns the identity of the Celula instance:  
+```
+{
+  publicKey: 'base64String',
+  generation: 'gen:N'
+}
+```
+
+### `GET` /claims/:uuid  
+
+Returns the claim by uuid  
+```
+{
+  "id": "uuid",
+  "claim": {
+    "date": "ISO Date",
+    "message": {
+      "source": {
+        "publicKey": "base64String",
+        "generation": "gen:N",
+        "celulaVersion": "repoVersion"
+      },
+      "destination": {
+        "ip": "",
+        "publicKey": "base64String",
+        "generation": "gen:N+1",
+        "repositoryUrl": "optional"
+      }
+    },
+    "signature": "base64String"
+  }
+}
+```
+
+
+### `GET` /claims/all  
+
+Returns an array with all signed claims by this Celula instance.  
+
+### `POST` /sign  
+
+Returns the signature of the requested body.
+
+### `POST` /verify  
+
+Verifies a given signature
+
+### `POST` /replicate  
+
+Replicates the Celula instance. The request body must contain the following object:  
+```
+{
+  "credentials": {
+    "type": "service_account",
+    "project_id": "",
+    "private_key_id": "",
+    "private_key": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
+    "client_email": "",
+    "client_id": "",
+    "auth_uri": "",
+    "token_uri": "",
+    "auth_provider_x509_cert_url": "",
+    "client_x509_cert_url": ""
+  },
+  "projectId": "required",
+  "zone": "required",
+  "vmName": "required",
+  "machineType": "optional",
+  "repositoryUrl": "optional-repository to be launched"
+}
+```
+
+The credentials object is obtained following these instructions:  
+
+1. Visit the [Google Developers Console](https://console.developers.google.com/project)  
+2. Create a new project  
+3. Activate the slide-out navigation tray and select API Manager.  
+4. Select Credentials from the side navigation.  
+5. Find the "Add credentials" drop down and select "Service account" to be guided through downloading a new JSON key file. When  creating the service account you must enable the **Project Editor** role.  
+6. Copy the key file json object under `credentials` when making the post request to replicate.  
+
+The repositoryUrl variable is optional, if you specify one, the following steps will be taken:  
+ - `git clone <repositoryUrl> repo && cd repo && npm install && npm start`  
+ - Port 80 and 443 are available for the NodeJS process.  
