@@ -16,7 +16,7 @@ This problem is equivalent to solving two separate problems:
 - How can I give proof that my service is actually running a given code, always.
 - How can I give proof that nobody has physical or remote access to the server.
 
-If I can give proof that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have solved my problem.  
+If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have solved my problem.  
 
 
 ## Previous work  
@@ -89,7 +89,7 @@ In order to launch a generation zero instance:
 - cd celula && npm install
 - npm start  
 
-If you wish to provide a certain degree of trust in your generation zero instance use zeit command line tool to freely create a server that will expose its contents and to which you will not have ssh access.  
+If you wish to provide a certain degree of trust in your generation zero instance use [zeit.co command line tool](https://zeit.co/now#) to freely create a server that will expose its contents and to which you will not have ssh access.  
 
 ## Celula API  
 
