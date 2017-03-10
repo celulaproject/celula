@@ -46,7 +46,7 @@ There is a simple solution to the problem if the following conditions are met:
 If we meet conditions 1, 2 and 3 then we can build a service (the source cell) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target service.  
 From that moment on, the service will be completely isolated and running the desired code.  
 
-The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a Generation zero server and therefore begin his own lineage of trust.  
+The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a Generation zero server and therefore begin his own lineage of trust. However, in the [Setup section](https://github.com/celulaproject/celula#setup) we propose a ceremony that might help establishing trust with generation zero instances.    
 
 It is relevant to note that it would be possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances including code and generated keys if required. This way the Celula instances can easily scale and preserve their properties.  
 
@@ -70,8 +70,6 @@ Each Celula instance is characterized by its key pair that define its identity. 
 When a new Celula instance is launched, it generates a key pair whose public key is exposed through the API in order to reveal its identity. When a third party makes a request to replicate, the Celula instance will query the GCE API in order to launch a new VM with an encrypted disk and running the Celula startup script. After the script is executed successfully, the source instance will query the destination instance until it's identity is available and then sign a claim stating it created such destination instance.  
 
 From that moment on, any interested party can verify the claim made by the source instance and have proof of the state of the destination instance.  
-
-Generation zero instances act as the root of a chain of trust since there is no way to ascertain that the launcher of the first Celula instance didn't access the key pair in order to forge false generation claims. Although, in the [Setup](https://github.com/celulaproject/celula#setup) section we do propose a ceremony that might help establishing trust with generation zero instances.  
 
 ### Current limitations  
 
