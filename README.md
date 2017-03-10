@@ -73,7 +73,7 @@ From that moment on, any interested party can verify the claim made by the sourc
 
 Generation zero instances act as the root of a chain of trust since there is no way to ascertain that the launcher of the first Celula instance didn't access the key pair in order to forge false generation claims. Although, in the [Setup](https://github.com/celulaproject/celula#setup) section we do propose a ceremony that might help establishing trust with generation zero instances.  
 
-### Limitations  
+### Current limitations  
 
 - The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE country restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
