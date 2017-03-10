@@ -208,7 +208,7 @@ Returns the state of the replication request under that uuid.
 
 Yes! There is a Celula-zero instance running on https://celula-project.jaime.world:3141 that complies with the setup described previously. The API is functional and therefore you can make request to have your software attested to be running a given code and without possible modifications.  
 
-## Feddback, comments, proposals
+## Feedback, comments, proposals
 
 Absolutely needed! Please open an issue and we'll start working on it.  
 Thanks!
