@@ -1,16 +1,16 @@
 # Celula  
 
-Celula is an approach to solve the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation. Celula extracts analogies from the biology sphere into computer programs and networks in order to propose a software based answer for this problem.
+Celula is an approach to the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation.
 
 The scope of Celula is very limited and subject to thorough review by hardware, software and systems experts. My intention is to start a discussion based on the prototype built for this purpose that will hopefully contribute to a solution to this problem.  
 
 ## Motivation  
 
-Imagine you want to run an automated lottery on the bitcoin network. Interested parties send money to address A and after X time one of the sending addresses is selected as winner. Then the address A sends all funds back to that winning address (let’s not worry about implementation details: whether all address must send a fixed amount to be part of the lottery or the address that sends more gets a bigger chance, etc). The main problem with this lottery scheme, and with every scheme that depends on automatic action by a computer upon an observable condition is that address's A secret key is known to the operator who controls the lottery server. Therefore he can get away with all the money and thus defraud the lottery customers. This is a particular case of automated contract execution upon observable conditions, where the executor must be held accountable as a "trusted party" (capital requirements, regulations, etc) since we cannot trust that nobody will access the lottery's secret key.  
+Imagine you want to run an automated lottery on the bitcoin network. Interested parties send money to address A and after X time one of the sending addresses is selected as winner. Then the address A sends all funds back to that winning address (let’s not worry about implementation details: whether all address must send a fixed amount to be part of the lottery or the address that sends more gets a bigger chance, etc). The main problem with this lottery scheme, and with every scheme that depends on automatic action by a computer upon an observable condition, is that address's A secret key is known to the operator who controls the lottery server. Therefore he can get away with all the money and thus defraud the lottery customers. This is a particular case of automated contract execution upon observable conditions, where the executor must be held accountable as a "trusted party" (capital requirements, regulations, etc) since we cannot trust that nobody will access the lottery's secret key.  
 
 ## Problem  
 
-Our motivation is to be able to trust in a machine rather than on the entities or organizations who launched the machine. It is some form of identity on the Internet for servers. That is, the ability to store cryptographic keys that no third party can alter or access, which can be preserved over time, and exposed to interact with through an API.  
+We want to be able to trust in a server rather than on the entities or organizations who launched the server. In particular the server's ability to store cryptographic keys that no third party can alter or access, which can be preserved over time, and exposed to interact with through an API.  
 
 This problem is equivalent to solving two separate problems:  
 > - How can I give proof that my service is actually running a given code, always.  
@@ -18,14 +18,13 @@ This problem is equivalent to solving two separate problems:
 
 If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have solved my problem.  
 
-
 ## Previous work  
 
 There is extensive literature on trusted computing and software attestation (I give a broad overview on [this blog post](https://www.jaime.world/2017/03/07/remote-computation/)).  
 
 The main conclusions we can deduce from previous work are:  
 
-- Apparently we do not have other option than to trust the Infrastructure as a service providers (Iaas) that they will enable safe cross-tenant sharing. That is if we want to make use of the amazing economies of scale they offer.  
+- Apparently we do not have other option than to trust the Infrastructure as a Service providers (IaaS) that they will enable safe cross-tenant sharing. That is if we want to make use of the amazing economies of scale they offer.  
 - It is our responsibility to use software that is resistant to side-channel attacks.  
 
 ## Proposition  
@@ -53,7 +52,7 @@ It is relevant to note that it would be possible to establish a secure communica
 
 ## Prototype  
 
-This prototype includes the core implementation that exposes a server that handles replication and an API endpoint for signing, verifying and querying generation claims.  
+This prototype includes the core implementation that exposes a server that handles replication and an API endpoint for signing, verifying and querying replication claims.  
 
 ### Terminology:  
 
@@ -72,7 +71,7 @@ When a new Celula instance is launched, it generates a key pair whose public key
 
 From that moment on, any interested party can verify the claim made by the source instance and have proof of the state of the destination instance.  
 
-Generation zero instances act as the root of a chain of trust since there is no way to ascertain that the launcher of the first Celula instance didn't access the key pair in order to forge false generation claims.
+Generation zero instances act as the root of a chain of trust since there is no way to ascertain that the launcher of the first Celula instance didn't access the key pair in order to forge false generation claims. Although, in the [Setup](https://github.com/celulaproject/celula#setup) section we do propose a ceremony that might help establishing trust with generation zero instances.  
 
 ### Limitations  
 
