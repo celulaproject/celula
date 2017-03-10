@@ -4,7 +4,9 @@ const signatures = require('sodium-signatures')
 const identity = require('./lib/identity')
 const replicate = require('./lib/gce/index')
 const getClaims = require('./lib/getClaims')
+const replicationRequest = require('./lib/replicationRequest')
 
+const uuid = require('uuid')
 const https = require('https')
 const selfsigned = require('selfsigned')
 const Koa = require('koa')
@@ -48,11 +50,35 @@ const celula = {
   },
   replicate: (ctx) => {
     ctx.request.body.keys = keys
-    return replicate(ctx.request.body)
+    ctx.request.body.uuid = uuid.v4()
+    // return inmediately with replication request id and then process
+    return replicationRequest.save(ctx.request.body, 'processing')
+    .then((data) => {
+      ctx.body = data
+      replicate(ctx.request.body)
+      .then((value) => {
+        replicationRequest.save(ctx.request.body, 'success')
+      })
+      .catch((err) => {
+        replicationRequest.save(ctx.request.body, err)
+      })
+    })
+    .catch((err) => {
+      return ctx.throw(500, err)
+    })
+  },
+  getReplicationRequest: (ctx, uuid) => {
+    return replicationRequest.get(uuid)
     .then((value) => {
       ctx.body = value
     })
     .catch((err) => {
+      if (err && err.notFound) {
+        return ctx.throw(404)
+      }
+      if (err && err.statusCode) {
+        return ctx.throw(err.statusCode, err.message)
+      }
       return ctx.throw(500, err)
     })
   }
@@ -60,6 +86,7 @@ const celula = {
 
 app.use(_.get('/id', celula.getId))
 app.use(_.get('/claims/:uuid', celula.getClaims))
+app.use(_.get('/replicate/:uuid', celula.getReplicationRequest))
 app.use(_.post('/sign', celula.sign))
 app.use(_.post('/verify', celula.verify))
 app.use(_.post('/replicate', celula.replicate))

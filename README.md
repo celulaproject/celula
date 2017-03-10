@@ -145,7 +145,9 @@ Verifies a given signature
 
 ### `POST` /replicate  
 
-Replicates the Celula instance. The request body must contain the following object:  
+Replicates the Celula instance.
+
+#### Request body:  
 ```
 {
   "credentials": {
@@ -187,3 +189,15 @@ The machineType must be one of [the available types in GCE](https://cloud.google
 The zone if provided must be one of [the available zones in GCE](https://cloud.google.com/compute/docs/regions-zones/regions-zones).  
 
 The vmName if provided must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
+
+#### Response body:  
+
+```
+{"id":"fd1bf9c8-4d20-4724-be79-278fee618a53","message":"processing"}
+```
+
+Where the id is the uuid of the replication request. If replication is successfull, the corresponding claim will also be retrievable under that uuid.  
+
+### `GET` /replicate/:uuid  
+
+Returns the state of the replication request under that uuid.  
