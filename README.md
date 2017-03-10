@@ -191,7 +191,7 @@ The machineType must be one of [the available types in GCE](https://cloud.google
 
 The zone if provided must be one of [the available zones in GCE](https://cloud.google.com/compute/docs/regions-zones/regions-zones).  
 
-The vmName if provided must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
+The vmName if provided must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
 
 #### Response body:  
 
@@ -208,3 +208,8 @@ Returns the state of the replication request under that uuid.
 ##  Can I use it already?  
 
 Yes! There is a Celula-zero instance running on https://celula-project.jaime.world:3141 that complies with the setup described previously. The API is functional and therefore you can make request to have your software attested to be running a given code and without possible modifications.  
+
+## Feddback, comments, proposals
+
+Absolutely needed! Please open an issue and we'll start working on it.  
+Thanks!
