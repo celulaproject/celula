@@ -1,14 +1,21 @@
 {
   "name": "celula",
   "version": "0.0.1",
-  "description": "Make computers behave like cells",
+  "description": "Remote software attestation in an untrusted environment",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 ~/celula/node_modules/pm2/bin/pm2 start app.js && ~/celula/node_modules/pm2/bin/pm2 save"
   },
   "author": "Jaime Echegaray Zipper",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/celulaproject/celula.git"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=7.0.0"
+  },
   "dependencies": {
     "google-cloud": "^0.47.0",
     "koa": "^2.0.1",
