@@ -1,8 +1,8 @@
 # Celula  
 
-Celula is an approach to solve the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation. Celula extracts analogies from the biology sphere into computer programs and networks in order to propose a software based solution for this problem.
+Celula is an approach to solve the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation. Celula extracts analogies from the biology sphere into computer programs and networks in order to propose a software based answer for this problem.
 
-The scope of Celula is very limited and subject to thorough review by hardware, software and systems experts. My intention is to start a discussion based on the prototype built for this purpose that will hopefully contribute to a wider solution to this problem.  
+The scope of Celula is very limited and subject to thorough review by hardware, software and systems experts. My intention is to start a discussion based on the prototype built for this purpose that will hopefully contribute to a solution to this problem.  
 
 ## Motivation  
 
@@ -10,10 +10,10 @@ Imagine you want to run an automated lottery on the bitcoin network. Interested 
 
 ## Problem  
 
-> How can I give a server an identity? That is, the ability to store cryptographic keys that no third party can alter or access and which can be preserved over time.  
+Our motivation is to be able to trust in a machine rather than on the entities or organizations who launched the machine. It is some form of identity on the Internet for servers. That is, the ability to store cryptographic keys that no third party can alter or access, which can be preserved over time, and exposed to interact with through an API.  
 
 This problem is equivalent to solving two separate problems:  
-- How can I give proof that my service is actually running a given code, always.
+> - How can I give proof that my service is actually running a given code, always.  
 - How can I give proof that nobody has physical or remote access to the server.
 
 If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have solved my problem.  
@@ -25,7 +25,7 @@ There is extensive literature on trusted computing and software attestation (I g
 
 The main conclusions we can deduce from previous work are:  
 
-- Apparently we do not have other option than to trust the Infrastructure as a service providers (Iaas) that they will enable safe cross-tenant sharing, that is if we want to make use of the amazing economies of scale they offer.  
+- Apparently we do not have other option than to trust the Infrastructure as a service providers (Iaas) that they will enable safe cross-tenant sharing. That is if we want to make use of the amazing economies of scale they offer.  
 - It is our responsibility to use software that is resistant to side-channel attacks.  
 
 ## Proposition  
@@ -44,12 +44,12 @@ There is a simple solution to the problem if the following conditions are met:
 
 ## Explanation  
 
-If we meet conditions 1, 2 and 3 then we can build a service (the source cell) that will expose an API to create a virtual machine on an third party IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target service.  
-From that moment on, the service will be completely isolated from third parties and running the desired code.  
+If we meet conditions 1, 2 and 3 then we can build a service (the source cell) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target service.  
+From that moment on, the service will be completely isolated and running the desired code.  
 
 The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a Generation zero server and therefore begin his own lineage of trust.  
 
-Afterwards it is possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances including code and generated keys if required. This way the Celula instances can easily scale and preserve their properties.  
+It is relevant to note that it would be possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances including code and generated keys if required. This way the Celula instances can easily scale and preserve their properties.  
 
 ## Prototype  
 
@@ -76,20 +76,23 @@ Generation zero instances act as the root of a chain of trust since there is no 
 
 ### Limitations  
 
-- The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
+- The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE country restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
 - Only NodeJS modules are supported for replication.  
-- The startup-script to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
+- The startup-script (and startup-script-celula-zero) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
 - The format of claims and the associated logic of storing and making them available must be reviewed. Maybe a DNS like system for matching public keys to an IP is also required.  
 
 ## Setup  
 
-In order to launch a generation zero instance:  
-- git clone
-- cd celula && npm install
-- npm start  
+Setup is relevant for generation zero instances. There are some steps one can take in order to assure trust when launching generation zero instances on Google Compute Engine. Here we describe our approach to it:  
 
-If you wish to provide a certain degree of trust in your generation zero instance use [zeit.co command line tool](https://zeit.co/now#) to freely create a server that will expose its contents and to which you will not have ssh access.  
+- Become a member of the [Celula project google group](https://groups.google.com/d/forum/celula-project).  
+- Create a project on GCE to be used for launching the Celula zero instances.  
+- Go to the [IAM page](https://console.cloud.google.com/iam-admin/iam/project) for your newly created project and add a new member: celula-project@googlegroups.com with _project viewer_ permissions.  
+- Go to [project metadata](https://console.cloud.google.com/compute/metadata?project) and set the `key` to `startup-script` and in `value` copy the contents of the `lib/gce/utils/startup-script-celula-zero.sh` file.  
+- Go to the [firewall settings for the default network](https://console.cloud.google.com/networking/networks/details/default?project) and add open the port `tcp:3141`.  
+- Post a message on the Celula group indicating the link to your GCE project.  
+- From that moment on, the project will be completely auditable for the members of the google group and every new instance that is created will have ssh access disabled and run a new version of the Celula core module.  
 
 ## Celula API  
 
@@ -201,3 +204,7 @@ Where the id is the uuid of the replication request. If replication is successfu
 ### `GET` /replicate/:uuid  
 
 Returns the state of the replication request under that uuid.  
+
+##  Can I use it already?  
+
+Yes! There is a Celula-zero instance running on https://celula-project.jaime.world:3141 that complies with the setup described previously. The API is functional and therefore you can make request to have your software attested to be running a given code and without possible modifications.  
