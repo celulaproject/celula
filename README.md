@@ -93,7 +93,7 @@ If you wish to provide a certain degree of trust in your generation zero instanc
 
 ## Celula API  
 
-The Celula API is available under https at the 3141 port on every instance running Celula.  
+The Celula API is available under https at port 3141 on every instance running Celula.  
 
 ### `GET` /id
 Returns the identity of the Celula instance:  
@@ -160,11 +160,12 @@ Replicates the Celula instance. The request body must contain the following obje
     "auth_provider_x509_cert_url": "",
     "client_x509_cert_url": ""
   },
-  "projectId": "required",
-  "zone": "required",
-  "vmName": "required",
-  "machineType": "optional",
-  "repositoryUrl": "optional-repository to be launched"
+  "zone": "optional:default to us-central1-c",
+  "vmName": "optional",
+  "machineType": "required",
+  "repositoryUrl": "optional:repository url to be launched",
+  "diskSizeGb": "optional:number representing GB, default to 10",
+  "diskType": "optional:default to pd-standard"
 }
 ```
 
@@ -180,3 +181,9 @@ The credentials object is obtained following these instructions:
 The repositoryUrl variable is optional, if you specify one, the following steps will be taken:  
  - `git clone <repositoryUrl> repo && cd repo && npm install && npm start`  
  - Port 80 and 443 are available for the NodeJS process.  
+
+The machineType must be one of [the available types in GCE](https://cloud.google.com/compute/docs/machine-types). f1-micro is not accepted.  
+
+The zone if provided must be one of [the available zones in GCE](https://cloud.google.com/compute/docs/regions-zones/regions-zones).  
+
+The vmName if provided must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
