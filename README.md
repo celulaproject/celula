@@ -75,7 +75,7 @@ From that moment on, any interested party can verify the claim made by the sourc
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
 - Only NodeJS modules are supported for replication.  
 - The format of claims and the associated logic of storing and making them available must be reviewed. Maybe a DNS like system for matching public keys to an IP is also required.  
-- **The startup-script (and startup-script-celula-zero) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).**  
+- **Important:** The [startup-script](https://github.com/celulaproject/celula/blob/master/lib/gce/startup-script.sh) and the [startup-script-celula-zero](https://github.com/celulaproject/celula/blob/master/lib/gce/utils/startup-script-celula-zero.sh) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
 
 ## Setup  
 
