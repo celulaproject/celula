@@ -1,6 +1,6 @@
 # Celula  
 
-Celula is an approach to the problem of knowing with absolute certainty the actual code running in an untrusted server, i.e., remote software attestation.
+Celula is an approach to the problem of knowing with absolute certainty the actual code running in an untrusted server.  
 
 The scope of Celula is very limited and subject to thorough review by hardware, software and systems experts. My intention is to start a discussion based on the prototype built for this purpose that will hopefully contribute to a solution to this problem.  
 
@@ -16,7 +16,7 @@ This problem is equivalent to solving two separate problems:
 > - How can I give proof that my service is actually running a given code, always.  
 - How can I give proof that nobody has physical or remote access to the server.
 
-If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have solved my problem.  
+If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have a solution.  
 
 ## Previous work  
 
@@ -24,7 +24,7 @@ There is extensive literature on trusted computing and software attestation (I g
 
 The main conclusions we can deduce from previous work are:  
 
-- Apparently we do not have other option than to trust the Infrastructure as a Service providers (IaaS) that they will enable safe cross-tenant sharing. That is if we want to make use of the amazing economies of scale they offer.  
+- If we want to make use of the economies of scale IaaS providers offer, we do not have other option than to trust that they will enable safe cross-tenant sharing and respect the agreed contracts.  
 - It is our responsibility to use software that is resistant to side-channel attacks.  
 
 ## Proposition  
@@ -46,7 +46,7 @@ There is a simple solution to the problem if the following conditions are met:
 If we meet conditions 1, 2 and 3 then we can build a service (the source cell) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target service.  
 From that moment on, the service will be completely isolated and running the desired code.  
 
-The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a Generation zero server and therefore begin his own lineage of trust. However, in the [Setup section](https://github.com/celulaproject/celula#setup) we propose a ceremony that might help establishing trust with generation zero instances.    
+The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a generation zero server and therefore begin his own lineage of trust. In the [Setup section](https://github.com/celulaproject/celula#setup) we propose a ceremony that might help establishing trust with generation zero instances.    
 
 It is relevant to note that it would be possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances including code and generated keys if required. This way the Celula instances can easily scale and preserve their properties.  
 
