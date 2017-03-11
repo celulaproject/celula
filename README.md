@@ -36,16 +36,17 @@ There is a simple solution to the problem if the following conditions are met:
     - attaching persistent disks to VMs.      
     - running startup-scripts on newly created VMs.  
 3. There is a script that once executed will completely block user and root access to the VM.  
-4. We can trust in the first server that will expose the Celula API (the source cell).  
+4. We can trust in the first server that will expose the Celula API (the source instance).  
 
 ## Explanation  
 
-If we meet conditions 1, 2 and 3 then we can build a service (the source cell) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target service.  
-From that moment on, the service will be completely isolated and running the desired code.  
+If we meet conditions 1, 2 and 3 then we can build a service (the source instance) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target code.  
 
-The first server to expose the Celula API (source cell) becomes the root of trust (on top of the IaaS) since we have no way to ascertain that it is effectively running the Celula code and not keeping any concealed information or providing false claims. In this sense it acts as the root CA of public key infrastructure scheme. Anyone can start an instance of Celula and register it as a generation zero server and therefore begin his own lineage of trust. In the [Setup section](https://github.com/celulaproject/celula#setup) we propose a ceremony that might help establishing trust with generation zero instances.    
+From that moment on, the service running on the destination instance will be completely isolated and running the desired code. Therefore the source instance will issue a signed claim stating that the destination instance is effectively running a given code which can not be modified.  
 
-It is relevant to note that it would be possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances including code and generated keys if required. This way the Celula instances can easily scale and preserve their properties.  
+The first server to expose the Celula API (source instance) becomes the root of trust on top of the IaaS. In this sense it acts as the root CA of a public key infrastructure scheme. Anyone can start an instance of Celula and register it as a source instance and therefore begin his own lineage of trust. In the [Setup section](https://github.com/celulaproject/celula#setup) we propose a ceremony that might help establishing trust with source instances and therefore enforce that the claims it generates are not tampered, malicious nor false.  
+
+It is relevant to note that it would be possible to establish a secure communication channel between Celula instances in order to share state variables that will enable completely cloning instances if required. This way the Celula generated instances can easily scale and preserve their properties.  
 
 ## Prototype  
 
@@ -53,12 +54,12 @@ This prototype includes the core implementation that exposes a server that handl
 
 ### Terminology:  
 
-- generation 0 (gen:0): the first instance that executes the Celula module. From the gen:0 instance are generated all other instances that will execute a Celula server and a second NodeJS module (if requested).  
-- generation N (gen:N, N > 0): the nth descendant of a gen:0 instance.  
-- claim: a statement cryptographically signed by the gen:N (N >=0) instance that states the creation of gen:(N+1) instance and some if its properties.  
-- replication: the act of requesting a Celula instane to clone itself on a third party instance and optionally deploy a third party NodeJS module.  
-- source instance: the Celula instance that receives a replication request.  
-- destination instance: the Celula instance that is created after a replication request.  
+- **generation 0 (gen:0)**: the first instance to be a source instance that executes the Celula module. From the gen:0 instance are generated all other instances that will execute a Celula server and a second NodeJS module (if requested).  
+- **generation N (gen:N, N > 0)**: the nth descendant of a gen:0 instance.  
+- **claim**: a statement cryptographically signed by the gen:N (N >=0) instance that states the creation of gen:(N+1) instance and some if its properties.  
+- **replication**: the act of requesting a Celula instane to clone itself on a third party instance and optionally deploy a third party NodeJS module.  
+- **source instance**: the Celula instance that receives a replication request.  
+- **destination instance**: the Celula instance that is created after a replication request.  
 
 ### Basic principle  
 
@@ -73,8 +74,8 @@ From that moment on, any interested party can verify the claim made by the sourc
 - The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE country restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
 - Only NodeJS modules are supported for replication.  
-- The startup-script (and startup-script-celula-zero) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
 - The format of claims and the associated logic of storing and making them available must be reviewed. Maybe a DNS like system for matching public keys to an IP is also required.  
+- **The startup-script (and startup-script-celula-zero) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).**  
 
 ## Setup  
 
