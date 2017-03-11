@@ -60,7 +60,7 @@ const celula = {
         replicationRequest.save(ctx.request.body, 'success')
       })
       .catch((err) => {
-        replicationRequest.save(ctx.request.body, err.message)
+        replicationRequest.save(ctx.request.body, 'error:' + err.message)
       })
     })
     .catch((err) => {
