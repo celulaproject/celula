@@ -10,13 +10,10 @@ Imagine you want to run an automated lottery on the bitcoin network. Interested 
 
 ## Problem  
 
-We want to be able to trust in a server rather than on the entities or organizations who launched the server. In particular the server's ability to store cryptographic keys that no third party can alter or access, which can be preserved over time, and exposed to interact with through an API.  
-
-This problem is equivalent to solving two separate problems:  
 > - How can I give proof that my service is actually running a given code, always.  
-- How can I give proof that nobody has physical or remote access to the server.
+- How can I give proof that nobody has user nor root access to the server.  
 
-If I can prove that my server is always running a given code and nobody can access the server then if that code exposes a cryptographic signing, encrypting and decrypting API I have a solution.  
+If I can prove that my server is always running a given code and nobody can access the server then I have a solution.  
 
 ## Previous work  
 
@@ -31,14 +28,14 @@ The main conclusions we can deduce from previous work are:
 
 There is a simple solution to the problem if the following conditions are met:  
 
-1. We can trust that the IaaS cloud platform will enforce safe cross-tenant sharing.  
+1. We can trust that the IaaS cloud platform will enforce safe cross-tenant sharing and do not disclose our data.  
 2. The IaaS cloud platform has an API for:  
     - creating VMs.  
     - creating persistent disks.  
     - encrypting persistent disks with customer supplied encryption keys.  
     - attaching persistent disks to VMs.      
     - running startup-scripts on newly created VMs.  
-3. There is a script that once executed will completely isolate the machine from external operators with physical or remote access to the VM.  
+3. There is a script that once executed will completely block user and root access to the VM.  
 4. We can trust in the first server that will expose the Celula API (the source cell).  
 
 ## Explanation  
