@@ -40,7 +40,7 @@ There is a simple solution to the problem if the following conditions are met:
 
 ## Explanation  
 
-If we meet conditions 1, 2 and 3 then we can build a service (the source instance) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the required code and start running the target code.  
+If we meet conditions 1, 2 and 3 then we can build a service (the source instance) that will expose an API to create a virtual machine on a third party's IaaS account, attach a persistent disk to that VM encrypted with a random key, execute the startup script that will isolate the VM and then fetch the target code and start running it.  
 
 From that moment on, the service running on the destination instance will be completely isolated and running the desired code. Therefore the source instance will issue a signed claim stating that the destination instance is effectively running a given code which can not be modified.  
 
@@ -58,6 +58,7 @@ This prototype includes the core implementation that exposes a server that handl
 - **generation N (gen:N, N > 0)**: the nth descendant of a gen:0 instance.  
 - **claim**: a statement cryptographically signed by the gen:N (N >=0) instance that states the creation of gen:(N+1) instance and some if its properties.  
 - **replication**: the act of requesting a Celula instane to clone itself on a third party instance and optionally deploy a third party NodeJS module.  
+- **target code**: the third party NodeJS module to be launched on a destination instance.  
 - **source instance**: the Celula instance that receives a replication request.  
 - **destination instance**: the Celula instance that is created after a replication request.  
 
@@ -73,7 +74,7 @@ From that moment on, any interested party can verify the claim made by the sourc
 
 - The prototype is implemented to work on Google Compute Engine (GCE) but it can work on any IaaS that satisfies the before mentioned conditions. ([See the GCE country restrictions here](https://cloud.google.com/compute/docs/disks/customer-supplied-encryption))  
 - All communication between Celula instances is secured with self-signed certificates, therefore clients connecting to the Celula API must accept self-signed certificates.  
-- Only NodeJS modules are supported for replication.  
+- Only NodeJS modules are supported for replication as target code.  
 - The format of claims and the associated logic of storing and making them available must be reviewed. Maybe a DNS like system for matching public keys to an IP is also required.  
 - **Important:** The [startup-script](https://github.com/celulaproject/celula/blob/master/lib/gce/startup-script.sh) and the [startup-script-celula-zero](https://github.com/celulaproject/celula/blob/master/lib/gce/utils/startup-script-celula-zero.sh) code to be launched on VM creation is prone to errors and most probably does not prevent all access from third parties. Contributions to optimize it are more than welcome (password protection for GRUB, better restriction for console login, system reboots, restricting Magic SysRq, etc).  
 
@@ -163,7 +164,7 @@ Replicates the Celula instance.
   "zone": "optional:default to us-central1-c",
   "vmName": "optional",
   "machineType": "required",
-  "repositoryUrl": "optional:repository url to be launched",
+  "repositoryUrl": "optional:repository url of the target code to be launched",
   "diskSizeGb": "optional:number representing GB, default to 10",
   "diskType": "optional:default to pd-standard"
 }
@@ -178,15 +179,17 @@ The credentials object is obtained following these instructions:
 5. Find the "Add credentials" drop down and select "Service account" to be guided through downloading a new JSON key file. When  creating the service account you must enable the **Project Editor** role.  
 6. Copy the key file json object under `credentials` when making the post request to replicate.  
 
-The repositoryUrl variable is optional, if you specify one, the following steps will be taken:  
+The repositoryUrl of the target code is optional, if you specify one, the following steps will be taken:  
  - `git clone <repositoryUrl> repo && cd repo && npm install && npm start`  
  - Port 80 and 443 are available for the NodeJS process.  
 
+If no repositoryUrl is specified, the destination instance will only run the Celula code.  
+
 The machineType must be one of [the available types in GCE](https://cloud.google.com/compute/docs/machine-types). f1-micro is not accepted.  
 
-The zone if provided must be one of [the available zones in GCE](https://cloud.google.com/compute/docs/regions-zones/regions-zones).  
+The zone, if provided, must be one of [the available zones in GCE](https://cloud.google.com/compute/docs/regions-zones/regions-zones).  
 
-The vmName if provided must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
+The vmName, if provided, must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.  
 
 #### Response body:  
 
@@ -202,7 +205,7 @@ Returns the state of the replication request under that uuid.
 
 ##  Can I use it already?  
 
-Yes! There is a Celula-zero instance running on https://celula-project.jaime.world:3141 that complies with the setup described previously. The API is functional and therefore you can make request to have your software attested to be running a given code and without possible modifications.  
+Yes! There is a Celula-zero instance running on https://celula-project.jaime.world:3141 that complies with the setup described previously. The API is functional and therefore you can make request to have your software attested to be running a given target code and without possible modifications.  
 
 ## Feedback, comments, proposals
 
