@@ -11,7 +11,7 @@ Imagine you want to run an automated lottery on the bitcoin network. Interested 
 ## Problem  
 
 > - How can I give proof that my service is actually running a given code, always.  
-- How can I give proof that nobody has user nor root access to the server.  
+> - How can I give proof that nobody has user nor root access to the server.  
 
 If I can prove that my server is always running a given code and nobody can access the server then I have a solution.  
 
